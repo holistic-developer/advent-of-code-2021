@@ -9,7 +9,7 @@ const convertFromBinary = (digits: number[]): number => {
 
 // stage 1
 let bitSums: number[] = [0,0,0,0,0,0,0,0,0,0,0,0];
-let gammaBits: number[] = [];
+let ɣBits: number[] = [];
 const totalLines = input.length;
 
 input.forEach((line) => {
@@ -19,13 +19,13 @@ input.forEach((line) => {
 });
 
 bitSums.forEach((digit, position) => {
-    gammaBits[position] = ((digit) >= totalLines / 2) ? 1 : 0;
+    ɣBits[position] = ((digit) >= totalLines / 2) ? 1 : 0;
 });
 
-const gamma = convertFromBinary(gammaBits);
-const epsilon = convertFromBinary(gammaBits.map(bit => bit === 1 ? 0: 1));
+const ɣ = convertFromBinary(ɣBits);
+const ε = convertFromBinary(ɣBits.map(bit => !bit ? 1 : 0));
 
-console.log(gamma * epsilon);
+console.log(ɣ * ε);
 
 // stage 2
 const findMostCommonBitAt = (bits: number[][], index: number, oxygen: boolean):number => {
