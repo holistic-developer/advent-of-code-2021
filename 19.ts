@@ -1,232 +1,319 @@
 import * as fs from 'fs'
 
+const rawInput = fs.readFileSync('19-input.txt')
 // const rawInput = fs.readFileSync('test-input.txt')
-const rawInput = fs.readFileSync('18-input.txt')
 
-const input = rawInput.toString().split('\n')
+const input = rawInput.toString().split('\n\n')
 
 // stage 1
-type SnailNumber = {
-	left?: SnailNumber
-	right?: SnailNumber
-	value?: number
+const beacons: number[][][] = input.map((value) => {
+	const lines = value.split('\n')
+	lines.shift()
+	return lines.map((line) => line.split(',').map((v) => parseInt(v)))
+})
+
+/* Matrix multiply a 1x3 and 3x3 matrix
+                a b c
+	[x, y, z] x d e f
+	            g h i
+ */
+function transform([x, y, z]: number[], [[a, b, c], [d, e, f], [g, h, i]]: number[][]): number[] {
+	return [x * a + y * d + z * g, x * b + y * e + z * h, x * c + y * f + z * i]
 }
 
-function parseSnailNumberCharacters(characters: string[]): SnailNumber {
-	const next = characters.shift()
-	if (next === '[') {
-		const left = parseSnailNumberCharacters(characters)
-		characters.shift() // consume ,
-		const right = parseSnailNumberCharacters(characters)
-		characters.shift() // consume ]
-		return { left, right }
-	} else {
-		return {
-			value: parseInt(next!),
+// generate 24 rotations around [0, 0, 0]
+// see http://www.euclideanspace.com/maths/algebra/matrix/transforms/examples/index.htm
+function generateAllRotations([x, y, z]: number[]): number[][] {
+	return [
+		transform(
+			[x, y, z],
+			[
+				[1, 0, 0],
+				[0, 1, 0],
+				[0, 0, 1],
+			]
+		),
+		transform(
+			[x, y, z],
+			[
+				[0, 0, 1],
+				[0, 1, 0],
+				[-1, 0, 0],
+			]
+		),
+		transform(
+			[x, y, z],
+			[
+				[-1, 0, 0],
+				[0, 1, 0],
+				[0, 0, -1],
+			]
+		),
+		transform(
+			[x, y, z],
+			[
+				[0, 0, -1],
+				[0, 1, 0],
+				[1, 0, 0],
+			]
+		),
+		transform(
+			[x, y, z],
+			[
+				[0, -1, 0],
+				[1, 0, 0],
+				[0, 0, 1],
+			]
+		),
+		transform(
+			[x, y, z],
+			[
+				[0, 0, 1],
+				[1, 0, 0],
+				[0, 1, 0],
+			]
+		),
+		transform(
+			[x, y, z],
+			[
+				[0, 1, 0],
+				[1, 0, 0],
+				[0, 0, -1],
+			]
+		),
+		transform(
+			[x, y, z],
+			[
+				[0, 0, -1],
+				[1, 0, 0],
+				[0, -1, 0],
+			]
+		),
+		transform(
+			[x, y, z],
+			[
+				[0, 1, 0],
+				[-1, 0, 0],
+				[0, 0, 1],
+			]
+		),
+		transform(
+			[x, y, z],
+			[
+				[0, 0, 1],
+				[-1, 0, 0],
+				[0, -1, 0],
+			]
+		),
+		transform(
+			[x, y, z],
+			[
+				[0, -1, 0],
+				[-1, 0, 0],
+				[0, 0, -1],
+			]
+		),
+		transform(
+			[x, y, z],
+			[
+				[0, 0, -1],
+				[-1, 0, 0],
+				[0, 1, 0],
+			]
+		),
+		transform(
+			[x, y, z],
+			[
+				[1, 0, 0],
+				[0, 0, -1],
+				[0, 1, 0],
+			]
+		),
+		transform(
+			[x, y, z],
+			[
+				[0, 1, 0],
+				[0, 0, -1],
+				[-1, 0, 0],
+			]
+		),
+		transform(
+			[x, y, z],
+			[
+				[-1, 0, 0],
+				[0, 0, -1],
+				[0, -1, 0],
+			]
+		),
+		transform(
+			[x, y, z],
+			[
+				[0, -1, 0],
+				[0, 0, -1],
+				[1, 0, 0],
+			]
+		),
+		transform(
+			[x, y, z],
+			[
+				[1, 0, 0],
+				[0, -1, 0],
+				[0, 0, -1],
+			]
+		),
+		transform(
+			[x, y, z],
+			[
+				[0, 0, -1],
+				[0, -1, 0],
+				[-1, 0, 0],
+			]
+		),
+		transform(
+			[x, y, z],
+			[
+				[-1, 0, 0],
+				[0, -1, 0],
+				[0, 0, 1],
+			]
+		),
+		transform(
+			[x, y, z],
+			[
+				[0, 0, 1],
+				[0, -1, 0],
+				[1, 0, 0],
+			]
+		),
+		transform(
+			[x, y, z],
+			[
+				[1, 0, 0],
+				[0, 0, 1],
+				[0, -1, 0],
+			]
+		),
+		transform(
+			[x, y, z],
+			[
+				[0, -1, 0],
+				[0, 0, 1],
+				[-1, 0, 0],
+			]
+		),
+		transform(
+			[x, y, z],
+			[
+				[-1, 0, 0],
+				[0, 0, 1],
+				[0, 1, 0],
+			]
+		),
+		transform(
+			[x, y, z],
+			[
+				[0, 1, 0],
+				[0, 0, 1],
+				[1, 0, 0],
+			]
+		),
+	]
+}
+
+function translate([x, y, z]: number[], dx: number, dy: number, dz: number): number[] {
+	return [x + dx, y + dy, z + dz]
+}
+
+function countMatchingBeacons(newSensor: number[][], initialSensor: number[][]): number {
+	return newSensor
+		.map((nb) => !!initialSensor.find((b) => b[0] === nb[0] && b[1] === nb[1] && b[2] === nb[2]))
+		.filter(Boolean).length
+}
+
+function matchesIn1d(existing: number[], newV: number[], offset: number) {
+	return newV.map((v) => v + offset).filter((v) => existing.indexOf(v) != -1).length >= 12
+}
+
+function numberSort(a: number, b: number) {
+	return a - b
+}
+
+function getPossibleOffsets(existing: number[], newBeacons: number[]) {
+	let offsets: number[] = []
+	for (const e of existing) {
+		for (let i = 0; i < newBeacons.length - 11; i++) {
+			offsets.push(e - newBeacons[i])
 		}
 	}
+	return [...new Set(offsets)]
 }
 
-function parseSnailNumber(i: string): SnailNumber {
-	const characters = i.split('')
-	return parseSnailNumberCharacters(characters)
-}
+const sensorCoordinates: number[][] = []
 
-function shouldExplode(sn: SnailNumber, depth: number): boolean {
-	if (!!sn.left) {
-		if (depth >= 4) return true
-		return shouldExplode(sn.left, depth + 1) || shouldExplode(sn.right!, depth + 1)
-	} else {
-		return false
-	}
-}
+function findMatch(existing: number[][], newBeacons: number[][]): number[][] | undefined {
+	let foundTransformation = undefined
+	let foundX, foundY, foundZ: number | undefined
 
-type ExplodingSnailNumber = {
-	carryoverLeft?: number
-	carryoverRight?: number
-	sn: SnailNumber
-	exploded: boolean
-}
+	const existingX = existing.map((b) => b[0]).sort(numberSort)
+	const existingY = existing.map((b) => b[1]).sort(numberSort)
+	const existingZ = existing.map((b) => b[2]).sort(numberSort)
+	const allRotations = newBeacons.map(generateAllRotations)
 
-function pushDownLeft(sn: SnailNumber, explodedValue: number): SnailNumber {
-	if (!sn.left)
-		return {
-			value: sn.value! + explodedValue,
-		}
-	return {
-		left: pushDownLeft(sn.left, explodedValue),
-		right: sn.right,
-	}
-}
-
-function pushDownRight(sn: SnailNumber, explodedValue: number): SnailNumber {
-	if (!sn.right)
-		return {
-			value: sn.value! + explodedValue,
-		}
-	return {
-		left: sn.left,
-		right: pushDownRight(sn.right, explodedValue),
-	}
-}
-
-function explodeFirstOccurance(sn: SnailNumber, depth: number = 0): ExplodingSnailNumber {
-	if (!sn.left || !sn.right) {
-		// is a leaf / number
-		return {
-			sn,
-		} as ExplodingSnailNumber
-	}
-	// exploded itself
-	if (depth >= 4) {
-		return {
-			sn: { value: 0 } as SnailNumber,
-			carryoverLeft: sn.left.value,
-			carryoverRight: sn.right.value!,
-			exploded: true,
+	for (let r = 0; r < 24; r++) {
+		const newX = allRotations.map((pos) => pos[r][0]).sort(numberSort)
+		const xOffsets = getPossibleOffsets(existingX, newX).filter((offset) => matchesIn1d(existingX, newX, offset))
+		foundX = xOffsets.find((x) => {
+			const newY = allRotations.map((pos) => pos[r][1]).sort(numberSort)
+			const yOffsets = getPossibleOffsets(existingY, newY).filter((offset) => matchesIn1d(existingY, newY, offset))
+			foundY = yOffsets.find((y) => {
+				const newZ = allRotations.map((pos) => pos[r][2]).sort(numberSort)
+				const zOffsets = getPossibleOffsets(existingZ, newZ).filter((offset) => matchesIn1d(existingZ, newZ, offset))
+				foundZ = zOffsets.find((z) => {
+					const transformed = allRotations.map((pos) => pos[r]).map((b) => translate(b, x, y, z))
+					const matchingPositions = countMatchingBeacons(transformed, existing)
+					if (matchingPositions >= 12) {
+						foundTransformation = transformed
+						return true
+					}
+					return false
+				})
+				return !!foundZ
+			})
+			return !!foundY
+		})
+		if (foundX) {
+			console.log([foundX, foundY, foundZ].join(','))
+			sensorCoordinates.push([foundX, foundY, foundZ])
+			break
 		}
 	}
-
-	const left = explodeFirstOccurance(sn.left, depth + 1)
-	// left child exploded
-	if (left.carryoverLeft && left.carryoverRight) {
-		return {
-			sn: {
-				left: left.sn,
-				right: pushDownLeft(sn.right, left.carryoverRight),
-			},
-			carryoverRight: 0,
-			carryoverLeft: left.carryoverLeft,
-			exploded: left.exploded,
-		}
-	}
-	// left child bubbled up an exploded value
-	if (left.carryoverLeft || left.carryoverRight) {
-		return {
-			sn: {
-				left: left.sn,
-				right: left.carryoverRight ? pushDownLeft(sn.right, left.carryoverRight) : sn.right,
-			},
-			carryoverLeft: left.carryoverLeft,
-			carryoverRight: 0,
-			exploded: left.exploded,
-		}
-	}
-
-	const right: ExplodingSnailNumber = !left.exploded
-		? explodeFirstOccurance(sn.right, depth + 1)
-		: {
-				sn: sn.right,
-				carryoverLeft: 0,
-				carryoverRight: 0,
-				exploded: left.exploded,
-		  }
-	// right child exploded
-	if (right.carryoverLeft && right.carryoverRight) {
-		return {
-			sn: {
-				left: pushDownRight(sn.left, right.carryoverLeft),
-				right: right.sn,
-			},
-			carryoverLeft: 0,
-			carryoverRight: right.carryoverRight,
-			exploded: true,
-		}
-	}
-	// right child bubbled up an exploded value
-	if (right.carryoverLeft || right.carryoverRight) {
-		return {
-			sn: {
-				left: right.carryoverLeft ? pushDownRight(left.sn, right.carryoverLeft) : left.sn,
-				right: right.sn,
-			},
-			carryoverLeft: 0,
-			carryoverRight: right.carryoverRight,
-			exploded: true,
-		}
-	}
-
-	return {
-		sn: {
-			left: left.sn,
-			right: right.sn,
-		},
-		exploded: left.exploded || right.exploded,
-	}
+	return foundTransformation
 }
 
-function explode(sn: SnailNumber): SnailNumber {
-	return explodeFirstOccurance(sn, 0).sn
-}
-
-function split(sn: SnailNumber): SnailNumber {
-	if (!!sn.left) {
-		return {
-			left: shouldSplit(sn.left) ? split(sn.left) : sn.left,
-			right: !shouldSplit(sn.left) && shouldSplit(sn.right!) ? split(sn.right!) : sn.right,
-		}
-	}
-	if (sn.value! < 9) {
-		return sn
-	}
-	return {
-		left: { value: Math.floor(sn.value! / 2) },
-		right: { value: Math.ceil(sn.value! / 2) },
+const allBeacons: number[][] = beacons.shift()!
+for (let i = 0; i < beacons.length; i++) {
+	const matchingBeacons = findMatch(allBeacons, beacons[i])
+	if (matchingBeacons != undefined) {
+		beacons.splice(i, 1)
+		matchingBeacons
+			.filter((nb) => !allBeacons.find((b) => b[0] === nb[0] && b[1] === nb[1] && b[2] === nb[2]))
+			.forEach((b) => allBeacons.push(b))
+		i = -1
 	}
 }
-
-function shouldSplit(sn: SnailNumber): boolean {
-	if (!!sn.left) {
-		return shouldSplit(sn.left) || shouldSplit(sn.right!)
-	}
-	return sn.value! > 9
+if (beacons.length > 0) {
+	console.log(beacons.length + ' sensor[s] could not be matched')
 }
 
-function explodeAndSplit(sn: SnailNumber): SnailNumber {
-	if (shouldExplode(sn, 0)) {
-		return explodeAndSplit(explode(sn))
-	}
-	if (shouldSplit(sn)) {
-		return explodeAndSplit(split(sn))
-	}
-	return sn
-}
-
-function addSnailNumber(a: SnailNumber, b: SnailNumber): SnailNumber {
-	const additionResult: SnailNumber = {
-		left: a,
-		right: b,
-	}
-	return explodeAndSplit(additionResult)
-}
-
-function snailNumberToString(sn: SnailNumber): string {
-	if (!!sn.left) {
-		return '[' + snailNumberToString(sn.left!) + ',' + snailNumberToString(sn.right!) + ']'
-	} else {
-		return sn.value!.toString()
-	}
-}
-
-function magnitude(sn: SnailNumber): number {
-	if (!!sn.left) {
-		return magnitude(sn.left) * 3 + magnitude(sn.right!) * 2
-	}
-	return sn.value!
-}
-
-let snailNumbers = input.map(parseSnailNumber)
-let total = snailNumbers.reduce(addSnailNumber)
-
-console.log(snailNumberToString(total))
-console.log(magnitude(total))
+console.log(allBeacons.length)
 
 // stage 2
-let magnitudes = []
-for (let i = 0; i < input.length; i++) {
-	for (let j = 0; j < input.length; j++) {
-		magnitudes.push(magnitude(addSnailNumber(snailNumbers[i], snailNumbers[j])))
-		magnitudes.push(magnitude(addSnailNumber(snailNumbers[j], snailNumbers[i])))
-	}
+function manhattanDistance([x1, y1, z1]: number[], [x2, y2, z2]: number[]): number {
+	return Math.abs(x1 - x2) + Math.abs(y1 - y2) + Math.abs(z1 - z2)
 }
-console.log(Math.max(...magnitudes))
+
+console.log(
+	sensorCoordinates
+		.map((c, _, array) => array.map((o) => manhattanDistance(o, c)).reduce((a, b) => Math.max(a, b)))
+		.reduce((a, b) => Math.max(a, b))
+)

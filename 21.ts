@@ -1,5 +1,3 @@
-import * as fs from 'fs'
-
 // const player1StartingPostition = 4
 // const player2StartingPostition = 8
 const player1StartingPostition = 5
