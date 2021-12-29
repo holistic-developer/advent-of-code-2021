@@ -1,7 +1,7 @@
 import * as fs from 'fs'
 
-const rawInput = fs.readFileSync('25-input.txt')
-// const rawInput = fs.readFileSync('test-input.txt')
+// const rawInput = fs.readFileSync('25-input.txt')
+const rawInput = fs.readFileSync('test-input.txt')
 
 // stage 1
 const field = rawInput
